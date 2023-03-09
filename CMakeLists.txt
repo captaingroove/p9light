@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(p9light)
+project(p9light VERSION 1.0)
 
 ## Set the C standard and warning level
 set(CMAKE_C_STANDARD 99)
@@ -290,5 +290,31 @@ target_link_libraries(threads thread 9 ${POSIXLIBS} )
 add_executable(hellosrv test/hellosrv.c )
 target_link_libraries(hellosrv 9pclient 9p thread 9 ${POSIXLIBS} )
 
-install(TARGETS 9 9p 9pclient bio regexp thread DESTINATION lib)
+install(
+  TARGETS 9 9p 9pclient bio regexp thread
+  EXPORT P9LightTargets
+  DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include/p9)
+
+## Generate export information for use with find_package() from other projects
+install(EXPORT P9LightTargets
+  FILE P9LightTargets.cmake
+  DESTINATION lib/cmake/P9Light
+)
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/P9LightConfig.cmake"
+  INSTALL_DESTINATION "lib/cmake/P9Light"
+  NO_SET_AND_CHECK_MACRO
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO
+  )
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/P9LightConfigVersion.cmake"
+  VERSION "${p9light_VERSION_MAJOR}.${p9light_VERSION_MINOR}"
+  COMPATIBILITY AnyNewerVersion
+)
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/P9LightConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/P9LightConfigVersion.cmake
+  DESTINATION lib/cmake/P9Light
+  )
