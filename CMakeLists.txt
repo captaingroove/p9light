@@ -8,6 +8,19 @@ set(C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 add_definitions(-D_POSIX_C_SOURCE=200809L)
 
+set(CMAKE_PREFIX_PATH
+	${PROJECT_SOURCE_DIR}/../sys
+)
+set(CMAKE_INSTALL_PREFIX
+	${CMAKE_PREFIX_PATH}
+)
+include_directories(
+	${CMAKE_PREFIX_PATH}/include
+)
+link_directories(
+	${CMAKE_PREFIX_PATH}/lib
+)
+
 include_directories(
   include
 )
@@ -223,7 +236,7 @@ add_library(thread
   src/libthread/wait.c
 )
 
-target_link_libraries(regexp
+target_link_libraries(thread
   ${POSIXLIBS}
 )
 
@@ -276,3 +289,6 @@ target_link_libraries(threads thread 9 ${POSIXLIBS} )
 
 add_executable(hellosrv test/hellosrv.c )
 target_link_libraries(hellosrv 9pclient 9p thread 9 ${POSIXLIBS} )
+
+install(TARGETS 9 9p 9pclient bio regexp thread DESTINATION lib)
+install(DIRECTORY include/ DESTINATION include/p9)
