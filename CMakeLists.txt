@@ -3,10 +3,11 @@ cmake_minimum_required(VERSION 3.21)
 project(p9light VERSION 1.0)
 
 ## Set the C standard and warning level
-set(CMAKE_C_STANDARD 99)
-set(C_STANDARD_REQUIRED ON)
+# set(CMAKE_C_STANDARD 99)
+# set(C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
-add_definitions(-D_POSIX_C_SOURCE=200809L)
+# add_definitions(-D_POSIX_C_SOURCE=200809L)
+# set(CFLAGS -Wno-sizeof-array-div)
 
 set(CMAKE_PREFIX_PATH
 	${PROJECT_SOURCE_DIR}/../sys
@@ -182,7 +183,7 @@ add_library(9
 )
 
 target_link_libraries(9
-  ${POSIXLIBS}
+  auth ${POSIXLIBS}
 )
 
 add_library(bio
@@ -281,17 +282,234 @@ add_library(9pclient
 )
 
 target_link_libraries(9pclient
+  mux ${POSIXLIBS}
+)
+
+add_library(mp
+  src/libmp/port/betomp.c
+  src/libmp/port/crt.c
+  # src/libmp/port/crttest.c
+  src/libmp/port/letomp.c
+  src/libmp/port/mpadd.c
+  src/libmp/port/mpaux.c
+  src/libmp/port/mpcmp.c
+  src/libmp/port/mpdigdiv.c
+  src/libmp/port/mpdiv.c
+  src/libmp/port/mpeuclid.c
+  src/libmp/port/mpexp.c
+  src/libmp/port/mpextendedgcd.c
+  src/libmp/port/mpfactorial.c
+  src/libmp/port/mpfmt.c
+  src/libmp/port/mpinvert.c
+  src/libmp/port/mpleft.c
+  src/libmp/port/mpmod.c
+  src/libmp/port/mpmul.c
+  src/libmp/port/mprand.c
+  src/libmp/port/mpright.c
+  src/libmp/port/mpsub.c
+  src/libmp/port/mptobe.c
+  src/libmp/port/mptoi.c
+  src/libmp/port/mptole.c
+  src/libmp/port/mptoui.c
+  src/libmp/port/mptouv.c
+  src/libmp/port/mptov.c
+  src/libmp/port/mpvecadd.c
+  src/libmp/port/mpveccmp.c
+  src/libmp/port/mpvecdigmuladd.c
+  src/libmp/port/mpvecsub.c
+  src/libmp/port/strtomp.c
+)
+
+target_link_libraries(mp
+  ${POSIXLIBS}
+)
+
+add_library(sec
+  src/libsec/port/aes.c
+  src/libsec/port/blowfish.c
+  src/libsec/port/decodepem.c
+  src/libsec/port/des3CBC.c
+  src/libsec/port/des3ECB.c
+  src/libsec/port/des.c
+  src/libsec/port/desCBC.c
+  src/libsec/port/desECB.c
+  src/libsec/port/desmodes.c
+  src/libsec/port/dsaalloc.c
+  src/libsec/port/dsagen.c
+  src/libsec/port/dsaprimes.c
+  src/libsec/port/dsaprivtopub.c
+  src/libsec/port/dsasign.c
+  src/libsec/port/dsaverify.c
+  src/libsec/port/egalloc.c
+  src/libsec/port/egdecrypt.c
+  src/libsec/port/egencrypt.c
+  src/libsec/port/eggen.c
+  src/libsec/port/egprivtopub.c
+  src/libsec/port/egsign.c
+  # src/libsec/port/egtest.c
+  src/libsec/port/egverify.c
+  src/libsec/port/fastrand.c
+  src/libsec/port/genprime.c
+  src/libsec/port/genrandom.c
+  src/libsec/port/gensafeprime.c
+  src/libsec/port/genstrongprime.c
+  src/libsec/port/hmac.c
+  # src/libsec/port/hmactest.c
+  src/libsec/port/md4.c
+  # src/libsec/port/md4test.c
+  src/libsec/port/md5block.c
+  src/libsec/port/md5.c
+  src/libsec/port/md5pickle.c
+  src/libsec/port/nfastrand.c
+  # src/libsec/port/primetest.c
+  src/libsec/port/prng.c
+  src/libsec/port/probably_prime.c
+  src/libsec/port/rc4.c
+  src/libsec/port/readcert.c
+  src/libsec/port/rsaalloc.c
+  src/libsec/port/rsadecrypt.c
+  src/libsec/port/rsaencrypt.c
+  src/libsec/port/rsafill.c
+  src/libsec/port/rsagen.c
+  src/libsec/port/rsaprivtopub.c
+  # src/libsec/port/rsatest.c
+  src/libsec/port/sha1block.c
+  src/libsec/port/sha1.c
+  src/libsec/port/sha1pickle.c
+  src/libsec/port/smallprimes.c
+  src/libsec/port/smallprimetest.c
+  src/libsec/port/thumb.c
+  src/libsec/port/tlshand.c
+  src/libsec/port/x509.c
+)
+
+target_link_libraries(sec
+  ${POSIXLIBS}
+)
+
+add_library(authsrv
+  src/libauthsrv/_asgetticket.c
+  src/libauthsrv/_asrdresp.c
+  src/libauthsrv/authdial.c
+  src/libauthsrv/convA2M.c
+  src/libauthsrv/convM2A.c
+  src/libauthsrv/convM2PR.c
+  src/libauthsrv/convM2T.c
+  src/libauthsrv/convM2TR.c
+  src/libauthsrv/convPR2M.c
+  src/libauthsrv/convT2M.c
+  src/libauthsrv/convTR2M.c
+  src/libauthsrv/nvcsum.c
+  src/libauthsrv/opasstokey.c
+  src/libauthsrv/passtokey.c
+  src/libauthsrv/readnvram.c
+)
+
+target_link_libraries(authsrv
+  ndb ${POSIXLIBS}
+)
+
+add_library(auth
+#	src/libauth/amount.c
+	src/libauth/amount_getkey.c
+	src/libauth/attr.c
+	src/libauth/auth_attr.c
+	src/libauth/auth_challenge.c
+#	src/libauth/auth_chuid.c
+	src/libauth/auth_getkey.c
+	src/libauth/auth_getuserpasswd.c
+	src/libauth/auth_proxy.c
+	src/libauth/auth_respond.c
+	src/libauth/auth_rpc.c
+	src/libauth/auth_userpasswd.c
+#	src/libauth/auth_wep.c
+	src/libauth/fsamount.c
+#	src/libauth/login.c
+#	src/libauth/newns.c
+#	src/libauth/noworld.c
+	src/libauth/nsamount.c
+)
+
+target_link_libraries(auth
+  9pclient bio authsrv ${POSIXLIBS}
+)
+
+add_library(ndb
+#	src/libndb/csgetval.c
+#	src/libndb/csipinfo.c
+#	src/libndb/dnsquery.c
+	src/libndb/ipattr.c
+	src/libndb/ndbaux.c
+	src/libndb/ndbcache.c
+	src/libndb/ndbcat.c
+	src/libndb/ndbconcatenate.c
+	src/libndb/ndbdiscard.c
+	src/libndb/ndbfree.c
+	src/libndb/ndbgetipaddr.c
+	src/libndb/ndbgetval.c
+	src/libndb/ndbhash.c
+	src/libndb/ndbipinfo.c
+	src/libndb/ndblookval.c
+	src/libndb/ndbopen.c
+	src/libndb/ndbparse.c
+	src/libndb/ndbreorder.c
+	src/libndb/ndbsubstitute.c
+	src/libndb/sysdnsquery.c
+)
+
+target_link_libraries(ndb
+  ip ${POSIXLIBS}
+)
+
+add_library(ip
+  # src/libip/AIX.c
+  src/libip/bo.c
+  # src/libip/BSD.c
+  src/libip/classmask.c
+  # src/libip/Darwin.c
+  # src/libip/DragonFly.c
+  src/libip/eipfmt.c
+  src/libip/equivip.c
+  # src/libip/FreeBSD.c
+  src/libip/freeipifc.c
+  src/libip/ipaux.c
+  src/libip/Linux.c
+  src/libip/myetheraddr.c
+  src/libip/myipaddr.c
+  # src/libip/NetBSD.c
+  # src/libip/none.c
+  # src/libip/OpenBSD.c
+  src/libip/parseether.c
+  src/libip/parseip.c
+  src/libip/ptclbsum.c
+  # src/libip/SunOS.c
+  src/libip/testreadipifc.c
+  src/libip/udp.c
+)
+
+target_link_libraries(ip
+  ${POSIXLIBS}
+)
+
+add_library(mux
+  src/libmux/io.c
+  src/libmux/mux.c
+  src/libmux/queue.c
+  src/libmux/thread.c
+)
+
+target_link_libraries(mux
   ${POSIXLIBS}
 )
 
 add_executable(threads test/threads.c )
-target_link_libraries(threads thread 9 ${POSIXLIBS} )
+target_link_libraries(threads thread 9 sec mp authsrv auth ndb ${POSIXLIBS} )
 
 add_executable(hellosrv test/hellosrv.c )
-target_link_libraries(hellosrv 9pclient 9p thread 9 ${POSIXLIBS} )
+target_link_libraries(hellosrv 9pclient 9p thread 9 sec mp authsrv auth ndb ${POSIXLIBS} )
 
 install(
-  TARGETS 9 9p 9pclient bio regexp thread
+  TARGETS 9 9p 9pclient bio regexp thread mp sec auth authsrv ndb ip mux
   EXPORT P9LightTargets
   DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include/p9)
