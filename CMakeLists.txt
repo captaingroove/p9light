@@ -502,17 +502,27 @@ target_link_libraries(mux
   ${POSIXLIBS}
 )
 
-add_executable(threads test/threads.c )
-target_link_libraries(threads thread 9 sec mp authsrv auth ndb ${POSIXLIBS} )
+add_executable(9p src/cmd/9p.c)
+target_link_libraries(threads thread 9 sec mp authsrv auth ndb ${POSIXLIBS})
 
-add_executable(hellosrv test/hellosrv.c )
-target_link_libraries(hellosrv 9pclient 9p thread 9 sec mp authsrv auth ndb ${POSIXLIBS} )
+add_executable(threads test/threads.c)
+target_link_libraries(threads thread 9 sec mp authsrv auth ndb ${POSIXLIBS})
+
+add_executable(hellosrv test/hellosrv.c)
+target_link_libraries(hellosrv 9pclient 9p thread 9 sec mp authsrv auth ndb ${POSIXLIBS})
 
 install(
   TARGETS 9 9p 9pclient bio regexp thread mp sec auth authsrv ndb ip mux
   EXPORT P9LightTargets
   DESTINATION lib)
-install(DIRECTORY include/ DESTINATION include/p9)
+
+install(
+  PROGRAMS 9p
+  DESTINATION bin)
+
+install(
+  DIRECTORY include/
+  DESTINATION include/p9)
 
 ## Generate export information for use with find_package() from other projects
 install(EXPORT P9LightTargets
