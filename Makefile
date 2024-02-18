@@ -20,7 +20,8 @@ POSIXLIBS = -lpthread -lm -lz
 ## When linking the executables, the library intra-dependencies need to be resolved
 ## we do this by setting the linker's library search path LD_LIBRARY_PATH during linking.
 ## The rpath of the libraries should be set with LD_RUN_PATH externally (depending on the local setup),
-## which is exported automatically by gnu make?!
+## which is exported automatically by gnu make!
+# export LD_RUN_PATH
 export LD_LIBRARY_PATH = $(B)
 
 all: \
