@@ -2,20 +2,26 @@ B = build
 O = o
 S = src
 PREFIX = /usr/local
-INSTINC = $(DESTDIR)$(PREFIX)/include/9p
+INSTINC = $(DESTDIR)$(PREFIX)/include/p9
 INSTLIB = $(DESTDIR)$(PREFIX)/lib
 INSTBIN = $(DESTDIR)$(PREFIX)/bin
 CPPFLAGS = -Iinclude
-CFLAGS = -fPIC -O2
-# CFLAGS = -fPIC -g -pthread
+# CFLAGS = -fPIC -O2
+CFLAGS = -fPIC -g
 LDFLAGS = -shared -L$(B)
 # LDFLAGS = -shared -pthread -L$(B)
-EXECFLAGS = -O2
-# EXECFLAGS = -g
+# EXECFLAGS = -O2
+EXECFLAGS = -g
 # EXELDFLAGS = -pthread -L$(B)
 EXELDFLAGS = -L$(B)
 POSIXLIBS = -lpthread -lm -lz
 # EXELIBS = -l9 -l9p -l9pclient -lauth -lauthsrv -lsec -lmp -lbio -lmux -lndb -lip -lthread $(POSIXLIBS)
+
+## When linking the executables, the library intra-dependencies need to be resolved
+## we do this by setting the linker's library search path LD_LIBRARY_PATH during linking.
+## The rpath of the libraries should be set with LD_RUN_PATH externally (depending on the local setup),
+## which is exported automatically by gnu make?!
+export LD_LIBRARY_PATH = $(B)
 
 all: \
   $(B) \
@@ -500,7 +506,7 @@ $(B)/threads: test/threads.c $(B)/lib9.so $(B)/libsec.so $(B)/libthread.so
 $(B)/hellosrv: test/hellosrv.c $(B)/lib9.so $(B)/lib9p.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9p -lsec -lthread -lm
 
-$(B)/9p: src/cmd/9p.c $(B)/lib9.so $(B)/lib9pclient.so $(B)/libbio.so $(B)/libsec.so $(B)/libauth.so $(B)/libthread.so
+$(B)/9p: src/cmd/9p.c $(B)/lib9.so $(B)/lib9pclient.so $(B)/libbio.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9pclient -lbio -lsec -lauth -lthread -lm
 
 $(B)/9pserve: src/cmd/9pserve.c $(B)/lib9.so $(B)/lib9p.so $(B)/libsec.so $(B)/libthread.so
