@@ -1,14 +1,19 @@
 B = build
 O = o
 S = src
-CPPFLAGS = -Iinclude
-CFLAGS = -fPIC -O2
-LDFLAGS = -shared -L$(B)
-POSIXLIBS = -lpthread -lm -lz
 PREFIX = /usr/local
 INSTINC = $(DESTDIR)$(PREFIX)/include/9p
 INSTLIB = $(DESTDIR)$(PREFIX)/lib
 INSTBIN = $(DESTDIR)$(PREFIX)/bin
+POSIXLIBS = -lpthread -lm -lz
+CPPFLAGS = -Iinclude
+# CFLAGS = -fPIC -O2 -pthread
+CFLAGS = -fPIC -g -pthread
+LDFLAGS = -shared -pthread -L$(B)
+# EXECFLAGS = -O2
+EXECFLAGS = -g
+EXELDFLAGS = -pthread -L$(B)
+EXELIBS = -l9 -l9p -l9pclient -lauth -lauthsrv -lsec -lmp -lbio -lmux -lndb -lip -lthread $(POSIXLIBS)
 
 all: \
   $(B) \
@@ -20,12 +25,15 @@ all: \
   $(B)/libregexp.so \
   $(B)/libthread.so \
   $(B)/lib9pclient.so \
+  $(B)/lib9p.so \
   $(B)/libauthsrv.so \
   $(B)/libauth.so \
-  $(B)/lib9.so \
-  $(B)/lib9p.so \
   $(B)/libsec.so \
-  $(B)/9p
+  $(B)/lib9.so \
+  $(B)/threads \
+  $(B)/hellosrv \
+  $(B)/9p \
+  $(B)/9pserve
 
 $(B):
 	mkdir $(B)
@@ -484,8 +492,14 @@ OBJ_MUX = \
 $(B)/libmux.so: $(OBJ_MUX)
 	$(CC) -o $@ $(LDFLAGS) $^ $(POSIXLIBS)
 
+$(B)/threads: test/threads.c
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ $(EXELIBS)
+
+$(B)/hellosrv: test/hellosrv.c
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ $(EXELIBS)
+
 $(B)/9p: src/cmd/9p.c
-	$(CC) $(CPPFLAGS) -L$(B) -o $@ -O2 $^ -l9 -l9p -l9pclient -lauth -lauthsrv -lsec -lmp -lbio -lmux -lndb -lip -lthread $(POSIXLIBS)
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ $(EXELIBS)
 
 $(B)/9pserve: src/cmd/9pserve.c
-	$(CC) $(CPPFLAGS) -L$(B) -o $@ -O2 $^ -l9 -l9p -l9pclient -lauth -lauthsrv -lsec -lmp -lbio -lmux -lndb -lip -lthread $(POSIXLIBS)
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ $(EXELIBS)
