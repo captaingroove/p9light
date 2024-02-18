@@ -5,15 +5,17 @@ PREFIX = /usr/local
 INSTINC = $(DESTDIR)$(PREFIX)/include/9p
 INSTLIB = $(DESTDIR)$(PREFIX)/lib
 INSTBIN = $(DESTDIR)$(PREFIX)/bin
-POSIXLIBS = -lpthread -lm -lz
 CPPFLAGS = -Iinclude
-# CFLAGS = -fPIC -O2 -pthread
-CFLAGS = -fPIC -g -pthread
-LDFLAGS = -shared -pthread -L$(B)
-# EXECFLAGS = -O2
-EXECFLAGS = -g
-EXELDFLAGS = -pthread -L$(B)
-EXELIBS = -l9 -l9p -l9pclient -lauth -lauthsrv -lsec -lmp -lbio -lmux -lndb -lip -lthread $(POSIXLIBS)
+CFLAGS = -fPIC -O2
+# CFLAGS = -fPIC -g -pthread
+LDFLAGS = -shared -L$(B)
+# LDFLAGS = -shared -pthread -L$(B)
+EXECFLAGS = -O2
+# EXECFLAGS = -g
+# EXELDFLAGS = -pthread -L$(B)
+EXELDFLAGS = -L$(B)
+POSIXLIBS = -lpthread -lm -lz
+# EXELIBS = -l9 -l9p -l9pclient -lauth -lauthsrv -lsec -lmp -lbio -lmux -lndb -lip -lthread $(POSIXLIBS)
 
 all: \
   $(B) \
@@ -493,13 +495,13 @@ $(B)/libmux.so: $(OBJ_MUX)
 	$(CC) -o $@ $(LDFLAGS) $^ $(POSIXLIBS)
 
 $(B)/threads: test/threads.c
-	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ $(EXELIBS)
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -lsec -lthread -lpthread -lm
 
 $(B)/hellosrv: test/hellosrv.c
-	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ $(EXELIBS)
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -l9p -lsec -lthread -lpthread -lm
 
 $(B)/9p: src/cmd/9p.c
-	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ $(EXELIBS)
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -l9pclient -lbio -lsec -lauth -lthread -lpthread -lm
 
 $(B)/9pserve: src/cmd/9pserve.c
-	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ $(EXELIBS)
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -l9p -lsec -lthread -lpthread -lm
