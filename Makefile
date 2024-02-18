@@ -3,7 +3,7 @@ O = o
 S = src
 CPPFLAGS = -Iinclude
 CFLAGS = -fPIC -O2
-LDFLAGS = -shared
+LDFLAGS = -shared -L$(B)
 POSIXLIBS = -lpthread -lm -lz
 PREFIX = /usr/local
 INSTINC = $(DESTDIR)$(PREFIX)/include/9p
@@ -19,12 +19,12 @@ all: \
   $(B)/libbio.so \
   $(B)/libregexp.so \
   $(B)/libthread.so \
-  $(B)/libsec.so \
+  $(B)/lib9pclient.so \
   $(B)/libauthsrv.so \
   $(B)/libauth.so \
   $(B)/lib9.so \
   $(B)/lib9p.so \
-  $(B)/lib9pclient.so \
+  $(B)/libsec.so \
   $(B)/9p
 
 $(B):
@@ -34,6 +34,7 @@ install:
 	install -D -t $(INSTINC) include/*.h
 	install -D -t $(INSTLIB) $(B)/*.so
 	install -D -t $(INSTBIN) $(B)/9p
+	install -D -t $(INSTBIN) $(B)/9pserve
 
 clean:
 	rm -f $$(find -name '*.'$(O))
@@ -484,4 +485,7 @@ $(B)/libmux.so: $(OBJ_MUX)
 	$(CC) -o $@ $(LDFLAGS) $^ $(POSIXLIBS)
 
 $(B)/9p: src/cmd/9p.c
-	$(CC) -o $@ -O2 $^ -l9 -l9p -l9pclient -lauth -lauthsrv -lsec -lmp -lbio -lthread $(POSIXLIBS)
+	$(CC) $(CPPFLAGS) -L$(B) -o $@ -O2 $^ -l9 -l9p -l9pclient -lauth -lauthsrv -lsec -lmp -lbio -lmux -lndb -lip -lthread $(POSIXLIBS)
+
+$(B)/9pserve: src/cmd/9pserve.c
+	$(CC) $(CPPFLAGS) -L$(B) -o $@ -O2 $^ -l9 -l9p -l9pclient -lauth -lauthsrv -lsec -lmp -lbio -lmux -lndb -lip -lthread $(POSIXLIBS)
