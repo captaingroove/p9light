@@ -495,13 +495,13 @@ $(B)/libmux.so: $(OBJ_MUX)
 	$(CC) -o $@ $(LDFLAGS) $^ $(POSIXLIBS)
 
 $(B)/threads: test/threads.c
-	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -lsec -lthread -lpthread -lm
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -lsec -lthread -lm
 
 $(B)/hellosrv: test/hellosrv.c
-	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -l9p -lsec -lthread -lpthread -lm
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -l9p -lsec -lthread -lm
 
 $(B)/9p: src/cmd/9p.c
-	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -l9pclient -lbio -lsec -lauth -lthread -lpthread -lm
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -l9pclient -lbio -lsec -lauth -lthread -lm
 
 $(B)/9pserve: src/cmd/9pserve.c
-	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -l9p -lsec -lthread -lpthread -lm
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -l9p -lsec -lthread -lm
