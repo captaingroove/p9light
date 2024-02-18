@@ -199,8 +199,8 @@ OBJ_9 = \
   src/lib9/utf/utfrune.$(O) \
   src/lib9/utf/utfutf.$(O)
 
-$(B)/lib9.so: $(OBJ_9)
-	$(CC) -o $@ $(LDFLAGS) $^ -lauth $(POSIXLIBS)
+$(B)/lib9.so: $(B)/libauth.so $(OBJ_9)
+	$(CC) -o $@ $(LDFLAGS) $(OBJ_9) -lauth $(POSIXLIBS)
 
 OBJ_BIO = \
   src/libbio/bbuffered.$(O) \
@@ -288,8 +288,8 @@ OBJ_9PCLIENT = \
   src/lib9pclient/write.$(O) \
   src/lib9pclient/wstat.$(O)
 
-$(B)/lib9pclient.so: $(OBJ_9PCLIENT)
-	$(CC) -o $@ $(LDFLAGS) $^ -lmux $(POSIXLIBS)
+$(B)/lib9pclient.so: $(B)/libmux.so $(OBJ_9PCLIENT)
+	$(CC) -o $@ $(LDFLAGS) $(OBJ_9PCLIENT) -lmux $(POSIXLIBS)
 
 OBJ_MP = \
   src/libmp/port/betomp.$(O) \
@@ -386,8 +386,8 @@ OBJ_SEC = \
   # src/libsec/port/primetest.c
   # src/libsec/port/rsatest.c
 
-$(B)/libsec.so: $(OBJ_SEC)
-	$(CC) -o $@ $(LDFLAGS) $^ -lauth -lmp $(POSIXLIBS)
+$(B)/libsec.so: $(B)/libauth.so $(B)/libmp.so $(OBJ_SEC)
+	$(CC) -o $@ $(LDFLAGS) $(OBJ_SEC) -lauth -lmp $(POSIXLIBS)
 
 OBJ_AUTHSRV = \
   src/libauthsrv/_asgetticket.$(O) \
@@ -406,8 +406,8 @@ OBJ_AUTHSRV = \
   src/libauthsrv/passtokey.$(O) \
   src/libauthsrv/readnvram.$(O)
 
-$(B)/libauthsrv.so: $(OBJ_AUTHSRV)
-	$(CC) -o $@ $(LDFLAGS) $^ -lndb -lbio $(POSIXLIBS)
+$(B)/libauthsrv.so: $(B)/libndb.so $(B)/libbio.so $(OBJ_AUTHSRV)
+	$(CC) -o $@ $(LDFLAGS) $(OBJ_AUTHSRV) -lndb -lbio $(POSIXLIBS)
 
 OBJ_AUTH = \
   src/libauth/amount_getkey.$(O) \
@@ -429,8 +429,8 @@ OBJ_AUTH = \
 #  src/libauth/newns.c
 #  src/libauth/noworld.c
 
-$(B)/libauth.so: $(OBJ_AUTH)
-	$(CC) -o $@ $(LDFLAGS) $^ -l9pclient -lbio -lauthsrv $(POSIXLIBS)
+$(B)/libauth.so: $(B)/lib9pclient.so $(B)/libbio.so $(B)/libauthsrv.so $(OBJ_AUTH)
+	$(CC) -o $@ $(LDFLAGS) $(OBJ_AUTH) -l9pclient -lbio -lauthsrv $(POSIXLIBS)
 
 OBJ_NDB = \
   src/libndb/ipattr.$(O) \
@@ -454,8 +454,8 @@ OBJ_NDB = \
 #  src/libndb/csipinfo.c
 #  src/libndb/dnsquery.c
 
-$(B)/libndb.so: $(OBJ_NDB)
-	$(CC) -o $@ $(LDFLAGS) $^ -lip $(POSIXLIBS)
+$(B)/libndb.so: $(B)/libip.so $(OBJ_NDB)
+	$(CC) -o $@ $(LDFLAGS) $(OBJ_NDB) -lip $(POSIXLIBS)
 
 OBJ_IP = \
   src/libip/bo.$(O) \
@@ -494,14 +494,14 @@ OBJ_MUX = \
 $(B)/libmux.so: $(OBJ_MUX)
 	$(CC) -o $@ $(LDFLAGS) $^ $(POSIXLIBS)
 
-$(B)/threads: test/threads.c
-	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -lsec -lthread -lm
+$(B)/threads: test/threads.c $(B)/lib9.so $(B)/libsec.so $(B)/libthread.so
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -lsec -lthread -lm
 
-$(B)/hellosrv: test/hellosrv.c
-	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -l9p -lsec -lthread -lm
+$(B)/hellosrv: test/hellosrv.c $(B)/lib9.so $(B)/lib9p.so $(B)/libsec.so $(B)/libthread.so
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9p -lsec -lthread -lm
 
-$(B)/9p: src/cmd/9p.c
-	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -l9pclient -lbio -lsec -lauth -lthread -lm
+$(B)/9p: src/cmd/9p.c $(B)/lib9.so $(B)/lib9pclient.so $(B)/libbio.so $(B)/libsec.so $(B)/libauth.so $(B)/libthread.so
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9pclient -lbio -lsec -lauth -lthread -lm
 
-$(B)/9pserve: src/cmd/9pserve.c
-	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $^ -l9 -l9p -lsec -lthread -lm
+$(B)/9pserve: src/cmd/9pserve.c $(B)/lib9.so $(B)/lib9p.so $(B)/libsec.so $(B)/libthread.so
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9p -lsec -lthread -lm
