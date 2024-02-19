@@ -15,7 +15,6 @@ EXECFLAGS = -g
 # EXELDFLAGS = -pthread -L$(B)
 EXELDFLAGS = -L$(B)
 POSIXLIBS = -lpthread -lm -lz
-# EXELIBS = -l9 -l9p -l9pclient -lauth -lauthsrv -lsec -lmp -lbio -lmux -lndb -lip -lthread $(POSIXLIBS)
 
 ## When linking the executables, the library intra-dependencies need to be resolved
 ## we do this by setting the linker's library search path LD_LIBRARY_PATH during linking.
@@ -468,7 +467,6 @@ OBJ_IP = \
   src/libip/bo.$(O) \
   src/libip/classmask.$(O) \
   src/libip/eipfmt.$(O) \
-  src/libip/equivip.$(O) \
   src/libip/freeipifc.$(O) \
   src/libip/ipaux.$(O) \
   src/libip/Linux.$(O) \
@@ -477,8 +475,9 @@ OBJ_IP = \
   src/libip/parseether.$(O) \
   src/libip/parseip.$(O) \
   src/libip/ptclbsum.$(O) \
-  src/libip/testreadipifc.$(O) \
   src/libip/udp.$(O)
+# src/libip/equivip.$(O)
+# src/libip/testreadipifc.$(O)
 # src/libip/AIX.c
 # src/libip/BSD.c
 # src/libip/Darwin.c
