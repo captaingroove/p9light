@@ -472,7 +472,7 @@ OBJ_IP = \
   src/libip/eipfmt.$(O) \
   src/libip/freeipifc.$(O) \
   src/libip/ipaux.$(O) \
-  src/libip/Linux.$(O) \
+  src/libip/$(shell uname).$(O) \
   src/libip/myetheraddr.$(O) \
   src/libip/myipaddr.$(O) \
   src/libip/parseether.$(O) \
