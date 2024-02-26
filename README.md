@@ -2,7 +2,7 @@
 
 ## Introduction
 
-OMM is a set of applications for playing multimedia streams in a distributed environment.
+Subset of Plan 9 from User Space.
 
 ## Dependencies
 
