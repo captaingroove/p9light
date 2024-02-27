@@ -8,10 +8,6 @@ INSTLIB = $(DESTDIR)$(PREFIX)/lib
 INSTBIN = $(DESTDIR)$(PREFIX)/bin
 
 CPPFLAGS = -Iinclude
-## At least need to link against the gblic dynamic runtime libs for network address resolving etc.
-# CSTATIC = -static -static-libgcc
-# CSTATIC = -static
-CSTATIC =
 ifeq ($(RELEASE), 1)
 CFLAGS = -fPIC -O2
 EXECFLAGS = -O2
@@ -22,12 +18,12 @@ endif
 
 LDFLAGS = -shared -fPIC -L$(B)
 EXELDFLAGS = -L$(B)
-POSIXLIBS = -lpthread -lm -lz
+POSIXLIBS = -lpthread -lm
 
 ## When linking the executables, the library intra-dependencies need to be resolved
 ## we do this by setting the linker's library search path LD_LIBRARY_PATH during linking.
 ## The rpath of the libraries should be set with LD_RUN_PATH externally (depending on the local setup),
-## which is exported automatically by gnu make to the subprocess
+## which should be exported automatically by gnu make to the subprocess
 # export LD_RUN_PATH
 export LD_LIBRARY_PATH = $(B)
 
@@ -583,22 +579,22 @@ $(B)/threads: test/threads.c $(B)/lib9.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -lsec -lthread -lm
 
 $(B)/threads_static: test/threads.c $(STATICLIBS)
-	$(CC) $(CPPFLAGS) $(CSTATIC) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
 
 $(B)/hellosrv: test/hellosrv.c $(B)/lib9.so $(B)/lib9p.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9p -lsec -lthread -lm
 
 $(B)/hellosrv_static: test/hellosrv.c $(STATICLIBS)
-	$(CC) $(CPPFLAGS) $(CSTATIC) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
 
 $(B)/9p: src/cmd/9p.c $(B)/lib9.so $(B)/lib9pclient.so $(B)/libbio.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9pclient -lbio -lsec -lauth -lthread -lm
 
 $(B)/9p_static: src/cmd/9p.c $(STATICLIBS)
-	$(CC) $(CPPFLAGS) $(CSTATIC) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
 
 $(B)/9pserve: src/cmd/9pserve.c $(B)/lib9.so $(B)/lib9p.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9p -lsec -lthread -lm
 
 $(B)/9pserve_static: src/cmd/9pserve.c $(STATICLIBS)
-	$(CC) $(CPPFLAGS) $(CSTATIC) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
+	$(CC) $(CPPFLAGS) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
