@@ -8,8 +8,10 @@ INSTLIB = $(DESTDIR)$(PREFIX)/lib
 INSTBIN = $(DESTDIR)$(PREFIX)/bin
 
 CPPFLAGS = -Iinclude
+## At least need to link against the gblic dynamic runtime libs for network address resolving etc.
 # CSTATIC = -static -static-libgcc
-CSTATIC = -static
+# CSTATIC = -static
+CSTATIC =
 ifeq ($(RELEASE), 1)
 CFLAGS = -fPIC -O2
 EXECFLAGS = -O2
