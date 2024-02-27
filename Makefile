@@ -29,10 +29,7 @@ POSIXLIBS = -lpthread -lm -lz
 # export LD_RUN_PATH
 export LD_LIBRARY_PATH = $(B)
 
-all: alldyn allstatic
-
-alldyn: \
-  $(B) \
+DYNLIBS = \
   $(B)/libip.so \
   $(B)/libmp.so \
   $(B)/libmux.so \
@@ -45,14 +42,15 @@ alldyn: \
   $(B)/libauthsrv.so \
   $(B)/libauth.so \
   $(B)/libsec.so \
-  $(B)/lib9.so \
+  $(B)/lib9.so
+
+DYNEXE = \
   $(B)/threads \
   $(B)/hellosrv \
   $(B)/9p \
   $(B)/9pserve
 
-allstatic: \
-  $(B) \
+STATICLIBS = \
   $(B)/libip.a \
   $(B)/libmp.a \
   $(B)/libmux.a \
@@ -65,11 +63,17 @@ allstatic: \
   $(B)/libauthsrv.a \
   $(B)/libauth.a \
   $(B)/libsec.a \
-  $(B)/lib9.a \
+  $(B)/lib9.a
+
+STATICEXE = \
   $(B)/threads_static \
   $(B)/hellosrv_static \
   $(B)/9p_static \
   $(B)/9pserve_static
+
+.PHONY: all clean install
+
+all: $(B) $(DYNLIBS) $(STATICLIBS) $(DYNEXE) $(STATICEXE)
 
 $(B):
 	mkdir -p $(B)
@@ -77,12 +81,15 @@ $(B):
 install:
 	install -D -t $(INSTINC) include/*.h
 	install -D -t $(INSTLIB) $(B)/*.so
+	install -D -t $(INSTLIB) $(B)/*.a
 	install -D -t $(INSTBIN) $(B)/9p
 	install -D -t $(INSTBIN) $(B)/9pserve
 
 clean:
 	rm -f $$(find -name '*.'$(O))
 	rm -rf $(B)
+
+## Libraries
 
 OBJ_9 = \
   src/lib9/_exits.$(O) \
@@ -567,26 +574,29 @@ $(B)/libmux.so: $(OBJ_MUX)
 $(B)/libmux.a: $(OBJ_MUX)
 	$(AR) rcs $@ $^
 
+
+## Executables
+
 $(B)/threads: test/threads.c $(B)/lib9.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -lsec -lthread -lm
 
-$(B)/threads_static: test/threads.c build/*.a
+$(B)/threads_static: test/threads.c $(STATICLIBS)
 	$(CC) $(CPPFLAGS) $(CSTATIC) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
 
 $(B)/hellosrv: test/hellosrv.c $(B)/lib9.so $(B)/lib9p.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9p -lsec -lthread -lm
 
-$(B)/hellosrv_static: test/hellosrv.c build/*.a
+$(B)/hellosrv_static: test/hellosrv.c $(STATICLIBS)
 	$(CC) $(CPPFLAGS) $(CSTATIC) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
 
 $(B)/9p: src/cmd/9p.c $(B)/lib9.so $(B)/lib9pclient.so $(B)/libbio.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9pclient -lbio -lsec -lauth -lthread -lm
 
-$(B)/9p_static: src/cmd/9p.c build/*.a
+$(B)/9p_static: src/cmd/9p.c $(STATICLIBS)
 	$(CC) $(CPPFLAGS) $(CSTATIC) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
 
 $(B)/9pserve: src/cmd/9pserve.c $(B)/lib9.so $(B)/lib9p.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9p -lsec -lthread -lm
 
-$(B)/9pserve_static: src/cmd/9pserve.c build/*.a
+$(B)/9pserve_static: src/cmd/9pserve.c $(STATICLIBS)
 	$(CC) $(CPPFLAGS) $(CSTATIC) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
