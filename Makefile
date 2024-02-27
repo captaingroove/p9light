@@ -8,6 +8,8 @@ INSTLIB = $(DESTDIR)$(PREFIX)/lib
 INSTBIN = $(DESTDIR)$(PREFIX)/bin
 
 CPPFLAGS = -Iinclude
+# CSTATIC = -static -static-libgcc
+CSTATIC = -static
 ifeq ($(RELEASE), 1)
 CFLAGS = -fPIC -O2
 EXECFLAGS = -O2
@@ -15,7 +17,8 @@ else
 CFLAGS = -fPIC -g
 EXECFLAGS = -g
 endif
-LDFLAGS = -shared -L$(B)
+
+LDFLAGS = -shared -fPIC -L$(B)
 EXELDFLAGS = -L$(B)
 POSIXLIBS = -lpthread -lm -lz
 
@@ -26,7 +29,9 @@ POSIXLIBS = -lpthread -lm -lz
 # export LD_RUN_PATH
 export LD_LIBRARY_PATH = $(B)
 
-all: \
+all: alldyn allstatic
+
+alldyn: \
   $(B) \
   $(B)/libip.so \
   $(B)/libmp.so \
@@ -46,8 +51,28 @@ all: \
   $(B)/9p \
   $(B)/9pserve
 
+allstatic: \
+  $(B) \
+  $(B)/libip.a \
+  $(B)/libmp.a \
+  $(B)/libmux.a \
+  $(B)/libndb.a \
+  $(B)/libbio.a \
+  $(B)/libregexp.a \
+  $(B)/libthread.a \
+  $(B)/lib9pclient.a \
+  $(B)/lib9p.a \
+  $(B)/libauthsrv.a \
+  $(B)/libauth.a \
+  $(B)/libsec.a \
+  $(B)/lib9.a \
+  $(B)/threads_static \
+  $(B)/hellosrv_static \
+  $(B)/9p_static \
+  $(B)/9pserve_static
+
 $(B):
-	mkdir $(B)
+	mkdir -p $(B)
 
 install:
 	install -D -t $(INSTINC) include/*.h
@@ -211,6 +236,9 @@ OBJ_9 = \
 $(B)/lib9.so: $(B)/libauth.so $(OBJ_9)
 	$(CC) -o $@ $(LDFLAGS) $(OBJ_9) -lauth $(POSIXLIBS)
 
+$(B)/lib9.a: $(B)/libauth.a $(OBJ_9)
+	$(AR) rcs $@ $^
+
 OBJ_BIO = \
   src/libbio/bbuffered.$(O) \
   src/libbio/bfildes.$(O) \
@@ -233,6 +261,9 @@ OBJ_BIO = \
 $(B)/libbio.so: $(OBJ_BIO)
 	$(CC) -o $@ $(LDFLAGS) $^ $(POSIXLIBS)
 
+$(B)/libbio.a: $(OBJ_BIO)
+	$(AR) rcs $@ $^
+
 OBJ_REGEXP = \
   src/libregexp/regcomp.$(O) \
   src/libregexp/regerror.$(O) \
@@ -244,6 +275,9 @@ OBJ_REGEXP = \
 
 $(B)/libregexp.so: $(OBJ_REGEXP)
 	$(CC) -o $@ $(LDFLAGS) $^ $(POSIXLIBS)
+
+$(B)/libregexp.a: $(OBJ_REGEXP)
+	$(AR) rcs $@ $^
 
 OBJ_THREAD = \
   src/libthread/bg.$(O) \
@@ -259,6 +293,9 @@ OBJ_THREAD = \
 
 $(B)/libthread.so: $(OBJ_THREAD)
 	$(CC) -o $@ $(LDFLAGS) $^ $(POSIXLIBS)
+
+$(B)/libthread.a: $(OBJ_THREAD)
+	$(AR) rcs $@ $^
 
 OBJ_9P = \
   src/lib9p/dirread.$(O) \
@@ -277,6 +314,9 @@ OBJ_9P = \
 
 $(B)/lib9p.so: $(OBJ_9P)
 	$(CC) -o $@ $(LDFLAGS) $^ $(POSIXLIBS)
+
+$(B)/lib9p.a: $(OBJ_9P)
+	$(AR) rcs $@ $^
 
 OBJ_9PCLIENT = \
   src/lib9pclient/access.$(O) \
@@ -299,6 +339,9 @@ OBJ_9PCLIENT = \
 
 $(B)/lib9pclient.so: $(B)/libmux.so $(OBJ_9PCLIENT)
 	$(CC) -o $@ $(LDFLAGS) $(OBJ_9PCLIENT) -lmux $(POSIXLIBS)
+
+$(B)/lib9pclient.a: $(B)/libmux.a $(OBJ_9PCLIENT)
+	$(AR) rcs $@ $^
 
 OBJ_MP = \
   src/libmp/port/betomp.$(O) \
@@ -336,6 +379,9 @@ OBJ_MP = \
 
 $(B)/libmp.so: $(OBJ_MP)
 	$(CC) -o $@ $(LDFLAGS) $^ $(POSIXLIBS)
+
+$(B)/libmp.a: $(OBJ_MP)
+	$(AR) rcs $@ $^
 
 OBJ_SEC = \
   src/libsec/port/aes.$(O) \
@@ -398,6 +444,9 @@ OBJ_SEC = \
 $(B)/libsec.so: $(B)/libauth.so $(B)/libmp.so $(OBJ_SEC)
 	$(CC) -o $@ $(LDFLAGS) $(OBJ_SEC) -lauth -lmp $(POSIXLIBS)
 
+$(B)/libsec.a: $(B)/libauth.a $(B)/libmp.a $(OBJ_SEC)
+	$(AR) rcs $@ $^
+
 OBJ_AUTHSRV = \
   src/libauthsrv/_asgetticket.$(O) \
   src/libauthsrv/_asrdresp.$(O) \
@@ -417,6 +466,9 @@ OBJ_AUTHSRV = \
 
 $(B)/libauthsrv.so: $(B)/libndb.so $(B)/libbio.so $(OBJ_AUTHSRV)
 	$(CC) -o $@ $(LDFLAGS) $(OBJ_AUTHSRV) -lndb -lbio $(POSIXLIBS)
+
+$(B)/libauthsrv.a: $(B)/libndb.a $(B)/libbio.a $(OBJ_AUTHSRV)
+	$(AR) rcs $@ $^
 
 OBJ_AUTH = \
   src/libauth/amount_getkey.$(O) \
@@ -440,6 +492,9 @@ OBJ_AUTH = \
 
 $(B)/libauth.so: $(B)/lib9pclient.so $(B)/libbio.so $(B)/libauthsrv.so $(OBJ_AUTH)
 	$(CC) -o $@ $(LDFLAGS) $(OBJ_AUTH) -l9pclient -lbio -lauthsrv $(POSIXLIBS)
+
+$(B)/libauth.a: $(B)/lib9pclient.a $(B)/libbio.a $(B)/libauthsrv.a $(OBJ_AUTH)
+	$(AR) rcs $@ $^
 
 OBJ_NDB = \
   src/libndb/ipattr.$(O) \
@@ -465,6 +520,9 @@ OBJ_NDB = \
 
 $(B)/libndb.so: $(B)/libip.so $(OBJ_NDB)
 	$(CC) -o $@ $(LDFLAGS) $(OBJ_NDB) -lip $(POSIXLIBS)
+
+$(B)/libndb.a: $(B)/libip.a $(OBJ_NDB)
+	$(AR) rcs $@ $^
 
 OBJ_IP = \
   src/libip/bo.$(O) \
@@ -494,6 +552,9 @@ OBJ_IP = \
 $(B)/libip.so: $(OBJ_IP)
 	$(CC) -o $@ $(LDFLAGS) $^ $(POSIXLIBS)
 
+$(B)/libip.a: $(OBJ_IP)
+	$(AR) rcs $@ $^
+
 OBJ_MUX = \
   src/libmux/io.$(O) \
   src/libmux/mux.$(O) \
@@ -503,14 +564,29 @@ OBJ_MUX = \
 $(B)/libmux.so: $(OBJ_MUX)
 	$(CC) -o $@ $(LDFLAGS) $^ $(POSIXLIBS)
 
+$(B)/libmux.a: $(OBJ_MUX)
+	$(AR) rcs $@ $^
+
 $(B)/threads: test/threads.c $(B)/lib9.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -lsec -lthread -lm
+
+$(B)/threads_static: test/threads.c build/*.a
+	$(CC) $(CPPFLAGS) $(CSTATIC) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
 
 $(B)/hellosrv: test/hellosrv.c $(B)/lib9.so $(B)/lib9p.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9p -lsec -lthread -lm
 
+$(B)/hellosrv_static: test/hellosrv.c build/*.a
+	$(CC) $(CPPFLAGS) $(CSTATIC) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
+
 $(B)/9p: src/cmd/9p.c $(B)/lib9.so $(B)/lib9pclient.so $(B)/libbio.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9pclient -lbio -lsec -lauth -lthread -lm
 
+$(B)/9p_static: src/cmd/9p.c build/*.a
+	$(CC) $(CPPFLAGS) $(CSTATIC) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
+
 $(B)/9pserve: src/cmd/9pserve.c $(B)/lib9.so $(B)/lib9p.so $(B)/libsec.so $(B)/libthread.so
 	$(CC) $(CPPFLAGS) $(EXECFLAGS) $(EXELDFLAGS) -o $@ $< -l9 -l9p -lsec -lthread -lm
+
+$(B)/9pserve_static: src/cmd/9pserve.c build/*.a
+	$(CC) $(CPPFLAGS) $(CSTATIC) $(EXECFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lm
